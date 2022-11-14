@@ -17,7 +17,6 @@ const Banner = () => {
                 </div>
             </div>
         </section>
-        // lzgsdj
     );
 };
 
