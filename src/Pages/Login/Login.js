@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthProvider';
 
 const Login = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const { signIn } = useContext(AuthContext);
+    const [signInError, setSignInError] = useState('');
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const from = location.state?.from?.pathname || '/';
 
     const handleLogin = (data) => {
         console.log(data);
+        setSignInError('');
+        signIn(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                navigate(from, { replace: true });
+            })
+            .catch(err => {
+                console.error(err)
+                setSignInError(err)
+            })
     }
 
     return (
@@ -30,7 +48,7 @@ const Login = () => {
                         </label>
                         <input type="password" {...register("password", {
                             required: "Password is required",
-                            minLength:{value:6,message:"Input at least 6 characters"}
+                            minLength: { value: 6, message: "Input at least 6 characters" }
                         })}
                             className="input input-bordered w-full max-w-xs" />
                         {errors.password && <p className='mt-2 text-error'>{errors.password?.message}</p>}
@@ -38,6 +56,9 @@ const Login = () => {
                         </label>
                     </div>
                     <input className='btn btn-accent w-full' type="submit" value="login" />
+                    <div>
+                        {signInError && <p className='text-error text-center'>Wrong Password</p>}
+                    </div>
                 </form>
 
                 <p className='text-sm p-6 text-center'>New to Doctors Portal? <Link to="/signup" className='text-primary'>Create new account</Link></p>

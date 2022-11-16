@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthProvider';
 
 const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const { createUser, updateUser } = useContext(AuthContext);
+    const [signUpError, setSignUpError] = useState('');
     const handleSignIn = (data) => {
         console.log(data);
+        setSignUpError('')
+        createUser(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                toast.success('Registration is completed')
+                const userInfo = {
+                    displayName: data.name
+                }
+                updateUser(userInfo)
+                    .then(() => { })
+                    .catch(err => console.error(err))
+            })
+            .catch(err => {
+                console.error(err)
+                setSignUpError(err)
+            })
     }
 
     return (
@@ -39,12 +60,14 @@ const SignUp = () => {
                         </label>
                         <input type="password" {...register("password", {
                             required: "Password is required",
-                            minLength: { value: 6, message: "Input at least 6 characters" }
+                            minLength: { value: 6, message: "Input at least 6 characters" },
+                            pattern: { value: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])/, message: "Password must be strong" }
                         })}
                             className="input input-bordered w-full max-w-xs" />
                         {errors.password && <p className='mt-2 text-error'>{errors.password?.message}</p>}
                     </div>
                     <input className='btn btn-accent w-full' type="submit" value="sign up" />
+                    {signUpError&&<p className='text-error text-center'>Email already in use</p>}
                 </form>
 
                 <p className='text-sm p-6 text-center'>Already have an account? <Link to="/login" className='text-primary'>Please Login</Link></p>
