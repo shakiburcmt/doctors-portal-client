@@ -1,19 +1,36 @@
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
+import Loading from '../../Shared/Loading/Loading';
 import BookingModal from '../BookingModal/BookingModal';
 import AppointmentOption from './AppointmentOption';
 
 const AvailableAppointments = ({ selectedDate }) => {
-    const [appointmentOptions, setAppointmentOptions] = useState([]);
-
     // jehetu ekhane map kore AppointmentOption e pathano hoyeche tai modal er state ekhane declare kora hoyeche
     const [treatment, setTreatment] = useState(null);
+    const date = format(selectedDate, 'PP');
 
-    useState(() => {
-        fetch('services.json')
-            .then(res => res.json())
-            .then(data => setAppointmentOptions(data))
-    }, [])
+    // jehetu async call tai =[] empty array set kora hoyeche
+    // const { data: appointmentOptions = [] } = useQuery({
+    //     queryKey: ['appointmentOptions'],
+    //     queryFn: () => fetch('http://localhost:5000/appointmentOptions')
+    //         .then(res => res.json())
+    // })
+
+    // react query with async await,, oporer part er alternative
+    const { data: appointmentOptions = [], refetch, isLoading } = useQuery({
+        queryKey: ['appointmentOptions', date],
+        queryFn: async () => {
+            const res = await fetch(`http://localhost:5000/v2/appointmentOptions?date=${date}`);
+            const data = await res.json();
+            return data;
+        }
+    })
+
+    if (isLoading) {
+        return <Loading></Loading>
+    }
+
     return (
         <section className='mt-24'>
             <p className='text-center text-primary font-semibold'>Available Appointments on {format(selectedDate, 'PP')}</p>
@@ -34,6 +51,7 @@ const AvailableAppointments = ({ selectedDate }) => {
                     treatment={treatment}
                     selectedDate={selectedDate}
                     setTreatment={setTreatment}
+                    refetch={refetch}
                 ></BookingModal>
             }
         </section>

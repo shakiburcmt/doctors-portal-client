@@ -1,15 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthProvider';
 
 const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const { createUser, updateUser } = useContext(AuthContext);
     const [signUpError, setSignUpError] = useState('');
+    const navigate = useNavigate();
+
     const handleSignIn = (data) => {
-        console.log(data);
         setSignUpError('')
         createUser(data.email, data.password)
             .then(result => {
@@ -20,7 +21,9 @@ const SignUp = () => {
                     displayName: data.name
                 }
                 updateUser(userInfo)
-                    .then(() => { })
+                    .then(() => {
+                        navigate('/');
+                    })
                     .catch(err => console.error(err))
             })
             .catch(err => {
@@ -67,7 +70,7 @@ const SignUp = () => {
                         {errors.password && <p className='mt-2 text-error'>{errors.password?.message}</p>}
                     </div>
                     <input className='btn btn-accent w-full' type="submit" value="sign up" />
-                    {signUpError&&<p className='text-error text-center'>Email already in use</p>}
+                    {signUpError && <p className='text-error text-center'>Email already in use</p>}
                 </form>
 
                 <p className='text-sm p-6 text-center'>Already have an account? <Link to="/login" className='text-primary'>Please Login</Link></p>
