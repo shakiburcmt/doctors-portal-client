@@ -2,15 +2,25 @@ import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthProvider';
+import useToken from '../../hooks/useToken';
 
 const Login = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const { signIn } = useContext(AuthContext);
     const [signInError, setSignInError] = useState('');
+
+    // this state is for token
+    const [signedInUserEmail, setSignedInUserEmail] = useState('');
+    const [token] = useToken(signedInUserEmail);
     const location = useLocation();
     const navigate = useNavigate();
 
     const from = location.state?.from?.pathname || '/';
+
+    // token jehetu observe korche tai email change hole dependency abar email ke call korbe then ready hole navigate korbe eijonno navigate ekhane dewa hoyeche
+    if (token) {
+        navigate(from, { replace: true });
+    }
 
     const handleLogin = (data) => {
         console.log(data);
@@ -19,7 +29,7 @@ const Login = () => {
             .then(result => {
                 const user = result.user;
                 console.log(user);
-                navigate(from, { replace: true });
+                setSignedInUserEmail(data.email);
             })
             .catch(err => {
                 console.error(err)
