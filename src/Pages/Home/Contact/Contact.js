@@ -11,7 +11,8 @@ const Contact = () => {
                     <p className='text-3xl text-white mb-10'>Stay connected with us</p>
                 </div>
                 <div>
-                    <form>
+                    {/* will be form instead of div */}
+                    <div>
                         <div>
                             <input type="text" placeholder="Email address" className="input input-bordered w-1/2 flex mx-auto mb-5" />
                         </div>
@@ -24,7 +25,7 @@ const Contact = () => {
                         <div className='flex justify-center mb-16'>
                             <PrimaryButton>Submit</PrimaryButton>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </section>

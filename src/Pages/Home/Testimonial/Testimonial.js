@@ -44,8 +44,8 @@ const Testimonial = () => {
             </div>
             <div className='grid lg:grid-cols-3 gap-14 mx-20'>
                 {
-                    TestimonialData.map(td => <Review
-                        key={td.id}
+                    TestimonialData.map((td,i) => <Review
+                        key={i}
                         review={td}
                     ></Review>)
                 }
